@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Deck title</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Onest:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* ==========================================================================
+   LIGHT KEYNOTE: a 1920×1080 stage scaled to fit any screen.
+   White paper, one signature colour (sky), a yellow highlighter, coral only
+   for warnings. One idea per slide. Motion choreographs; it never decorates.
+   ========================================================================== */
+:root{
+  --paper:#FFFFFF; --mist:#F2F5F7; --mist-2:#E8EEF2; --line:#D9E1E7;
+  --ink:#0F1B26; --sub:#5A6B7B; --faint:#93A2AF;
+  --sky:#42B0D5; --sky-ink:#0E78A6; --sky-soft:#E3F3F9; --navy:#0B3954;
+  --coral:#F2553A; --coral-soft:#FDE9E4; --sun:#FFD84D; --sun-soft:#FFF3BF; --sun-ink:#8A6A00;
+  --f-disp:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --f-body:"Onest","Segoe UI",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --ease:cubic-bezier(.22,.8,.2,1);
+  color-scheme:light;
+}
+html,body{height:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);overflow:hidden;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  transition:background-color .8s var(--ease)}
+body.blue{background:var(--sky)}
+
+/* ---------- stage + slides ---------- */
+#stage{position:fixed;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center}
+.slide{position:absolute;inset:0;padding:150px 150px 120px;display:flex;flex-direction:column;
+  opacity:0;visibility:hidden;transform:translateX(70px);transition:opacity .7s var(--ease),transform .9s var(--ease),visibility .7s}
+.slide.past{transform:translateX(-70px)}
+.slide.active{opacity:1;visibility:visible;transform:none}
+.notes{display:none}
+
+/* ---------- chrome: section badge, page number, progress rail ---------- */
+#kicker{position:absolute;left:150px;top:64px;font-family:var(--f-mono);font-size:20px;letter-spacing:.12em;text-transform:uppercase;color:var(--sub);display:flex;gap:18px;align-items:center;transition:color .6s}
+#kicker b{display:inline-grid;place-items:center;min-width:38px;height:38px;padding:0 8px;border-radius:19px;background:var(--ink);color:var(--paper);font-weight:500;letter-spacing:0}
+#pageno{position:absolute;right:150px;top:64px;font-family:var(--f-mono);font-size:20px;color:var(--faint);font-variant-numeric:tabular-nums}
+#rail{position:absolute;left:150px;right:150px;bottom:56px;height:4px;border-radius:2px;background:var(--mist-2)}
+#rail i{display:block;height:100%;border-radius:2px;background:var(--ink);width:0;transition:width .8s var(--ease)}
+body.blue #kicker{color:var(--navy)} body.blue #kicker b{background:var(--navy);color:var(--sky)} body.blue #pageno{color:var(--navy)}
+body.blue #rail{background:rgba(11,57,84,.2)} body.blue #rail i{background:var(--navy)}
+
+/* ---------- motion: visible at rest, choreographed on entry ---------- */
+.slide.active .a{animation:inUp 1s var(--ease) both;animation-delay:calc(var(--d,0)*110ms + 250ms)}
+@keyframes inUp{from{opacity:0;transform:translateY(34px);filter:blur(8px)}to{opacity:1;transform:none;filter:none}}
+.slide.active .drop{animation:drop .9s cubic-bezier(.3,1.35,.45,1) both;animation-delay:calc(var(--d,0)*120ms + 300ms)}
+@keyframes drop{from{opacity:0;transform:translateY(-80px)}to{opacity:1;transform:none}}
+.frag{opacity:0;transform:translateY(24px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.frag.shown{opacity:1;transform:none}
+
+/* ---------- type ---------- */
+h1,h2,h3{margin:0;font-family:var(--f-disp);text-wrap:balance}
+h2{font-size:104px;line-height:.98;font-weight:800;letter-spacing:-.025em;max-width:1500px}
+h3{font-size:44px;line-height:1.05;font-weight:700;letter-spacing:-.01em}
+p{margin:0}
+.lede{font-size:38px;line-height:1.38;color:var(--sub);max-width:1250px;text-wrap:pretty}
+.lede b{color:var(--ink);font-weight:600}
+.body{font-size:28px;line-height:1.45;color:var(--sub)}
+.label{font-family:var(--f-mono);font-size:20px;letter-spacing:.12em;text-transform:uppercase;color:var(--sub)}
+.hl{background:linear-gradient(transparent 58%,var(--sun) 58% 92%,transparent 92%);padding:0 .06em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.sky{color:var(--sky-ink)} .coral{color:var(--coral)}
+.spacer{flex:1} .mt-auto{margin-top:auto}
+button{font:inherit;cursor:pointer}
+
+/* ---------- component: title ---------- */
+.t-title{font-size:236px;line-height:.86;font-weight:800;letter-spacing:-.045em;margin-top:40px}
+.t-title .w{display:inline-block}
+.slide.active .t-title .w{animation:inUp 1.1s var(--ease) both;animation-delay:calc(var(--i)*140ms + 200ms)}
+.t-title .dot{color:var(--sky)}
+.caret{display:inline-block;width:.07em;height:.72em;background:var(--sky);margin-left:.06em;vertical-align:-.02em;animation:blink 1.1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.byrow{display:flex;justify-content:space-between;align-items:flex-end;gap:40px}
+.pills{display:flex;gap:16px;flex-wrap:wrap}
+.pills span{font-family:var(--f-disp);font-weight:600;font-size:34px;padding:14px 30px;border-radius:40px;border:2px solid var(--line);color:var(--sub)}
+.pills span:first-child{background:var(--sky-soft);border-color:var(--sky);color:var(--sky-ink)}
+.pills i{font-style:normal;color:var(--faint);align-self:center;font-size:30px}
+.who{text-align:right}
+.who b{display:block;font-family:var(--f-disp);font-size:36px;font-weight:700}
+.who span{font-size:24px;color:var(--sub)}
+
+/* ---------- component: divider (data-blue="1") ---------- */
+.divider{justify-content:center}
+.div-num{font-family:var(--f-disp);font-weight:800;font-size:200px;line-height:.8;color:var(--navy);letter-spacing:-.04em}
+.div-title{font-family:var(--f-disp);font-weight:800;font-size:250px;line-height:.85;letter-spacing:-.05em;color:var(--paper)}
+.div-sub{font-size:44px;line-height:1.3;color:var(--navy);max-width:1300px;font-weight:500}
+.div-toc{display:flex;gap:14px;flex-wrap:wrap}
+.div-toc span{font-size:28px;padding:14px 26px;border-radius:40px;background:rgba(255,255,255,.35);color:var(--navy);font-weight:500}
+.div-toc b{font-family:var(--f-mono);margin-right:12px}
+
+/* ---------- component: cards + banner + chips ---------- */
+.grid{display:grid;gap:26px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))} .g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card{border-radius:28px;background:var(--mist);padding:34px 36px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.card h3{font-size:40px}
+.card p{font-size:25px;line-height:1.42;color:var(--sub)}
+.card .k{font-family:var(--f-mono);font-size:18px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.card .eg{margin-top:auto;padding-top:16px;border-top:2px solid rgba(15,27,38,.08);font-size:23px;line-height:1.4;color:var(--ink)}
+.card .eg b{display:block;font-family:var(--f-mono);font-size:16px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:4px}
+.card.sky{background:var(--sky-soft)} .card.sky h3,.card.sky .k{color:var(--sky-ink)}
+.card.sun{background:var(--sun-soft)} .card.coral{background:var(--coral-soft)} .card.coral h3{color:var(--coral)}
+.banner{border-radius:24px;padding:28px 40px;font-size:30px;line-height:1.4;background:var(--sun-soft)}
+.banner b{font-weight:600}
+.banner.coral{background:var(--coral-soft)} .banner.sky{background:var(--sky-soft)}
+.snap{font-family:var(--f-mono);font-size:18px;color:var(--faint);letter-spacing:.04em;white-space:nowrap}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{display:inline-block;font-family:var(--f-mono);font-size:20px;padding:9px 14px;border-radius:10px;background:var(--paper);border:1px solid var(--line);white-space:nowrap}
+
+/* ---------- component: count-up facts ---------- */
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px;margin-top:50px}
+.fact{border-radius:30px;background:var(--mist);padding:34px 32px;display:flex;flex-direction:column;gap:12px}
+.fact b{font-family:var(--f-disp);font-weight:800;font-size:110px;line-height:.85;letter-spacing:-.05em}
+.fact b small{font-size:56px;letter-spacing:-.02em}
+.fact p{font-size:25px;line-height:1.38;color:var(--sub)}
+.fact.sky{background:var(--sky-soft)} .fact.sky b{color:var(--sky-ink)}
+.fact.sun{background:var(--sun-soft)}
+
+/* ---------- component: pipeline (flow of steps with marching arrows) ---------- */
+.pipe{display:flex;align-items:stretch;gap:0}
+.pn{flex:1;border-radius:22px;background:var(--mist);padding:28px 26px;font-size:28px;line-height:1.3;font-weight:500;min-height:220px;display:flex;flex-direction:column;justify-content:flex-start;gap:10px;min-width:0}
+.pn small{font-family:var(--f-mono);font-size:17px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:400}
+.pn.ai{background:var(--sky-soft)} .pn.ai small{color:var(--sky-ink)}
+.pn.you{background:var(--sun)} .pn.you small{color:var(--ink)}
+.ar{width:60px;flex:none;height:4px;align-self:center;position:relative;background:repeating-linear-gradient(90deg,var(--faint) 0 10px,transparent 10px 18px)}
+.slide.active .ar{animation:march .8s linear infinite}
+@keyframes march{to{background-position:18px 0}}
+.ar::after{content:"";position:absolute;right:-2px;top:-8px;border:10px solid transparent;border-left-color:var(--faint);border-right:0}
+
+/* ---------- component: conversation with a lighting rail ---------- */
+.convo{flex:1;display:grid;grid-template-columns:420px minmax(0,1fr);gap:60px;margin-top:40px;min-height:0}
+.rail4{display:flex;flex-direction:column;position:relative}
+.rail4::before{content:"";position:absolute;left:22px;top:20px;bottom:20px;width:4px;background:var(--mist-2);border-radius:2px;z-index:0}
+.rail4 div{position:relative;z-index:1;display:grid;grid-template-columns:48px 1fr;gap:24px;align-items:start;padding:14px 0}
+.rail4 div i{width:48px;height:48px;border-radius:50%;background:var(--paper);border:5px solid var(--line);box-sizing:border-box;transition:all .4s}
+.rail4 div b{display:block;font-family:var(--f-disp);font-size:34px;font-weight:700;color:var(--faint);transition:color .4s}
+.rail4 div span{font-size:22px;color:var(--faint);line-height:1.35;transition:color .4s}
+.rail4 div.lit i{background:var(--sky);border-color:var(--sky);box-shadow:0 0 0 10px var(--sky-soft)}
+.rail4 div.lit b{color:var(--ink)} .rail4 div.lit span{color:var(--sub)}
+.chat{display:flex;flex-direction:column;gap:14px;min-width:0}
+.bub{align-self:flex-end;max-width:80%;background:var(--ink);color:var(--paper);font-size:26px;line-height:1.4;padding:18px 26px;border-radius:26px 26px 6px 26px}
+.bub.l{align-self:flex-start;background:var(--paper);color:var(--ink);border-radius:26px 26px 26px 6px;border:1px solid var(--line);font-size:25px}
+.chat .plan{align-self:flex-start;max-width:86%;border-radius:26px 26px 26px 6px;background:var(--sky-soft);padding:20px 26px;font-size:25px;line-height:1.45}
+.chat .plan b{color:var(--sky-ink)}
+
+/* ---------- component: stepper (clickable journey, one panel per step) ---------- */
+.stp{flex:1;display:flex;flex-direction:column;margin-top:44px;min-height:0}
+.stp-nodes{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));position:relative}
+.stp-nodes::before{content:"";position:absolute;left:22px;right:22px;top:22px;height:4px;border-radius:2px;background:var(--mist-2);z-index:0}
+.stp-node{position:relative;z-index:1;display:flex;flex-direction:column;align-items:flex-start;gap:12px;background:none;border:0;padding:0 8px 0 0;text-align:left;color:inherit}
+.stp-node i{font-style:normal;width:46px;height:46px;border-radius:50%;background:var(--paper);border:4px solid var(--line);display:grid;place-items:center;font-family:var(--f-disp);font-weight:800;font-size:20px;color:var(--faint);box-sizing:border-box;transition:all .4s}
+.stp-node span{font-size:18px;line-height:1.25;color:var(--faint);font-weight:600;transition:color .4s}
+.stp-node.seen i{border-color:var(--sky);color:var(--sky-ink)} .stp-node.seen span{color:var(--sub)}
+.stp-node.on i{background:var(--sky);border-color:var(--sky);color:var(--paper);box-shadow:0 0 0 9px var(--sky-soft)}
+.stp-node.on span{color:var(--ink)}
+.stp-node:focus-visible{outline:4px solid var(--sky);outline-offset:4px;border-radius:8px}
+.stp-panels{position:relative;flex:1;margin-top:40px;min-height:0}
+.stp-panel{position:absolute;inset:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:50px;opacity:0;transform:translateY(18px);transition:opacity .5s var(--ease),transform .5s var(--ease);pointer-events:none}
+.stp-panel.on{opacity:1;transform:none;pointer-events:auto}
+.stp-panel .l{display:flex;flex-direction:column;gap:20px}
+.stp-panel .l .label{color:var(--sky-ink)}
+.stp-panel h3{font-size:64px;font-weight:800;letter-spacing:-.025em;line-height:1}
+.stp-panel .did{font-size:31px;line-height:1.45}
+.stp-panel .q{font-family:var(--f-disp);font-weight:600;font-size:38px;line-height:1.25;color:var(--sub);border-left:6px solid var(--sky);padding-left:24px}
+.stp-panel .r{display:flex;flex-direction:column;gap:18px}
+.stp-panel .hap{border-radius:28px;background:var(--sky-soft);padding:34px 38px;font-size:29px;line-height:1.45}
+.stp-panel .hap .label{display:block;color:var(--sky-ink);margin-bottom:10px}
+.stp-panel .les{border-radius:20px;background:var(--sun-soft);padding:22px 28px;font-size:27px;line-height:1.4;display:flex;gap:16px;align-items:baseline}
+.stp-panel .les b{font-family:var(--f-mono);font-size:16px;letter-spacing:.1em;text-transform:uppercase;color:var(--sun-ink);flex:none;font-weight:500}
+
+/* ---------- component: numbered practice list ---------- */
+.prac{flex:1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:min-content;gap:30px 60px;margin-top:50px;align-content:start}
+.pr{display:grid;grid-template-columns:52px 1fr;gap:20px;align-items:start}
+.pr i{font-style:normal;width:52px;height:52px;border-radius:14px;background:var(--sky-soft);color:var(--sky-ink);display:grid;place-items:center;font-family:var(--f-disp);font-weight:800;font-size:24px}
+.pr b{display:block;font-family:var(--f-disp);font-size:31px;font-weight:700;line-height:1.1;letter-spacing:-.01em}
+.pr span{font-size:22px;line-height:1.38;color:var(--sub)}
+
+/* ---------- component: finale (data-blue="1") ---------- */
+.finale{flex:1;display:flex;flex-direction:column;justify-content:center;gap:50px}
+.jrn{display:flex;flex-wrap:wrap;align-items:center;gap:10px 34px}
+.jrn span{font-family:var(--f-disp);font-weight:800;font-size:150px;line-height:.95;letter-spacing:-.05em;color:rgba(255,255,255,.35)}
+.slide.active .jrn span{animation:jlit .8s var(--ease) both;animation-delay:calc(var(--i)*450ms + 300ms)}
+@keyframes jlit{from{color:rgba(255,255,255,.35);transform:translateY(20px)}to{color:var(--paper);transform:none}}
+.jrn i{font-style:normal;font-family:var(--f-disp);font-size:90px;color:var(--navy);opacity:.5}
+.qa-big{display:flex;justify-content:space-between;align-items:flex-end;gap:40px;padding-top:40px;border-top:3px solid rgba(11,57,84,.25)}
+.qa-big b{font-family:var(--f-disp);font-weight:800;font-size:120px;letter-spacing:-.04em;color:var(--navy);line-height:.9}
+.qa-big p{font-size:30px;color:var(--navy);text-align:right;line-height:1.4;font-weight:500}
+
+/* ---------- viewer controls + presenter notes ---------- */
+#ctrls{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));display:flex;gap:8px;z-index:9;opacity:.35;transition:opacity .3s}
+#ctrls:hover,#ctrls:focus-within{opacity:1}
+.ctl{height:38px;min-width:42px;padding:0 12px;border-radius:19px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font-family:var(--f-mono);font-size:13px}
+.ctl[aria-pressed="true"]{background:var(--sky-ink);border-color:var(--sky-ink);color:var(--paper)}
+#motionBtn[aria-pressed="false"]{background:var(--paper);color:var(--sub);border-color:var(--line)}
+#notes{position:fixed;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));bottom:calc(64px + env(safe-area-inset-bottom,0px));z-index:10;max-width:900px;margin:0 auto;max-height:38vh;overflow:auto;background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:18px;padding:20px 26px;font-size:16px;line-height:1.6;box-shadow:0 30px 60px -20px rgba(15,27,38,.25)}
+#notes h5{margin:0 0 8px;font-family:var(--f-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--sky-ink)}
+#notes p{margin:0 0 8px}
+
+/* ---------- animations off (button or A key) ---------- */
+body.no-motion .slide,body.no-motion .frag,body.no-motion .stp-panel{transition:none!important}
+body.no-motion .slide.active *,body.no-motion .slide.active *::before,body.no-motion .slide.active *::after{animation:none!important}
+body.no-motion .jrn span{color:var(--paper)}
+
+/* ==========================================================================
+   SLIDE-SPECIFIC CSS GOES BELOW. Scope every rule to its slide id
+   (#s-name .thing) so a generic class name can never leak into other slides.
+   ========================================================================== */
+</style>
+</head>
+<body>
+<main id="stage">
+  <div id="kicker"><b>·</b><span></span></div>
+  <div id="pageno"></div>
+  <div id="rail"><i></i></div>
+
+<!-- 1 · title -->
+<section class="slide" id="s-title" data-k="Opening" data-sec="·">
+  <p class="label a" style="--d:0">Workshop · for the team</p>
+  <h1 class="t-title"><span class="w" style="--i:0">Big</span> <span class="w" style="--i:1">idea<span class="dot">.</span></span><span class="caret"></span></h1>
+  <p class="lede a" style="--d:4;margin-top:44px">One sentence that says what the audience will leave with, and <b>why it matters to them</b>.</p>
+  <div class="spacer"></div>
+  <div class="byrow">
+    <div class="pills a" style="--d:6"><span>Understand</span><i>→</i><span>Think</span><i>→</i><span>Apply</span></div>
+    <div class="who a" style="--d:7"><b>Presenter name</b><span>Team · Organisation</span></div>
+  </div>
+  <aside class="notes"><p>Presenter notes live in an aside on every slide. Press N to show them.</p></aside>
+</section>
+
+<!-- 2 · statement -->
+<section class="slide" id="s-why" data-k="Opening" data-sec="·">
+  <h2 class="a">Not which buttons. <span class="sky">When, why and how.</span></h2>
+  <p class="lede a" style="--d:2;margin-top:44px">A statement slide carries one idea. Put the single phrase that matters in a <span class="hl">yellow highlight</span>.</p>
+  <div class="banner a mt-auto" style="--d:4"><b>One idea per slide.</b> If you need a second idea, you need a second slide.</div>
+</section>
+
+<!-- 3 · divider -->
+<section class="slide divider" id="s-part1" data-k="Part I · Understand" data-sec="I" data-blue="1">
+  <p class="div-num a">Part I</p>
+  <p class="div-title a" style="--d:1">Understand</p>
+  <p class="div-sub a" style="--d:3;margin-top:40px">What this part answers, in one line.</p>
+  <div class="div-toc a" style="--d:4;margin-top:50px"><span><b>A</b>First section</span><span><b>B</b>Second section</span><span><b>C</b>Third section</span></div>
+</section>
+
+<!-- 4 · three cards -->
+<section class="slide" id="s-cards" data-k="A · Three things" data-sec="A">
+  <h2 class="a">Three things worth knowing.</h2>
+  <div class="grid g3 a" style="--d:2;margin-top:60px;flex:1">
+    <div class="card"><span class="k">01 · Label</span><h3>A short claim</h3><p>Two lines of explanation, written for the audience, not for the presenter.</p><div class="eg"><b>Example</b>A concrete case from their own work.</div></div>
+    <div class="card sky"><span class="k">02 · Label</span><h3>A short claim</h3><p>The highlighted card is the one you want them to remember.</p><div class="eg"><b>Example</b>A concrete case from their own work.</div></div>
+    <div class="card"><span class="k">03 · Label</span><h3>A short claim</h3><p>Keep every card the same shape so the eye compares, not reads.</p><div class="eg"><b>Example</b>A concrete case from their own work.</div></div>
+  </div>
+</section>
+
+<!-- 5 · count-up facts -->
+<section class="slide" id="s-facts" data-k="A · In numbers" data-sec="A">
+  <h2 class="a">The numbers that frame it.</h2>
+  <div class="facts a" style="--d:2">
+    <div class="fact sky"><b data-to="208" data-suf="k">0</b><p>What the first number counts.</p></div>
+    <div class="fact"><b data-to="50">0</b><p>What the second number counts.</p></div>
+    <div class="fact"><b data-to="9">0</b><p>What the third number counts.</p></div>
+    <div class="fact sun"><b>~<span data-to="20">0</span></b><p>What the fourth number counts.</p></div>
+  </div>
+  <p class="snap a mt-auto" style="--d:5">Source · date of the snapshot</p>
+</section>
+
+<!-- 6 · pipeline -->
+<section class="slide" id="s-flow" data-k="B · How it flows" data-sec="B">
+  <h2 class="a" style="font-size:88px">“A request, quoted as the user would say it.”</h2>
+  <div class="pipe a" style="--d:2;margin-top:70px">
+    <div class="pn"><small>Input</small>What goes in, and what it means</div><span class="ar"></span>
+    <div class="pn ai"><small>Step</small>The first thing that happens</div><span class="ar"></span>
+    <div class="pn ai"><small>Step</small>The second thing that happens</div><span class="ar"></span>
+    <div class="pn you"><small>You</small>The human checkpoint</div>
+  </div>
+  <p class="lede a" style="--d:4;margin-top:50px">The takeaway in one sentence. <b>The bold part is what they repeat later.</b></p>
+</section>
+
+<!-- 7 · conversation (press → to play) -->
+<section class="slide" id="s-chat" data-k="C · Example" data-sec="C">
+  <h2 class="a" style="font-size:88px">“I don't understand <span class="sky">this concept</span>.”</h2>
+  <div class="convo">
+    <div class="rail4 a" style="--d:1">
+      <div class="lit"><i></i><p><b>First move</b><span>What the learner does first.</span></p></div>
+      <div data-at="2"><i></i><p><b>Second move</b><span>Lights up at step 2.</span></p></div>
+      <div data-at="4"><i></i><p><b>Third move</b><span>Lights up at step 4.</span></p></div>
+    </div>
+    <div class="chat">
+      <div class="bub l frag">The assistant's first answer, short and concrete.</div>
+      <div class="bub frag">The user's follow-up question?</div>
+      <div class="bub l frag">The answer that makes it click.</div>
+      <div class="bub frag">Test me.</div>
+      <div class="plan frag"><b>Exactly.</b> The conclusion, tied back to their own work.</div>
+    </div>
+  </div>
+  <span class="snap a" style="--d:3">Illustrative exchange</span>
+  <aside class="notes"><p>Press → to play the conversation one message at a time.</p></aside>
+</section>
+
+<!-- 8 · stepper (press → or click a step) -->
+<section class="slide" id="s-steps" data-k="D · The journey" data-sec="D">
+  <h2 class="a" style="font-size:84px">Four moves, start to finish.</h2>
+  <div class="stp a" style="--d:1;--n:4">
+    <div class="stp-nodes">
+      <button class="stp-node on" type="button"><i>1</i><span>First move</span></button>
+      <button class="stp-node" type="button"><i>2</i><span>Second move</span></button>
+      <button class="stp-node" type="button"><i>3</i><span>Third move</span></button>
+      <button class="stp-node" type="button"><i>4</i><span>Fourth move</span></button>
+    </div>
+    <div class="stp-panels">
+      <div class="stp-panel on"><div class="l"><span class="label">Step 1 · What I did</span><h3>First move</h3><p class="did">What was done, in plain words.</p></div><div class="r"><p class="hap"><span class="label">What happened</span>The result.</p><p class="les"><b>Lesson</b>The habit to copy.</p></div></div>
+      <div class="stp-panel"><div class="l"><span class="label">Step 2 · What I said</span><h3>Second move</h3><p class="q">“A real quote works better than a paraphrase.”</p></div><div class="r"><p class="hap"><span class="label">What happened</span>The result.</p><p class="les"><b>Lesson</b>The habit to copy.</p></div></div>
+      <div class="stp-panel"><div class="l"><span class="label">Step 3 · What I did</span><h3>Third move</h3><p class="did">What was done, in plain words.</p></div><div class="r"><p class="hap"><span class="label">What happened</span>The result.</p><p class="les"><b>Lesson</b>The habit to copy.</p></div></div>
+      <div class="stp-panel"><div class="l"><span class="label">Step 4 · What I did</span><h3>Fourth move</h3><p class="did">What was done, in plain words.</p></div><div class="r"><p class="hap"><span class="label">What happened</span>The result.</p><p class="les"><b>Lesson</b>The habit to copy.</p></div></div>
+    </div>
+    <span class="frag" hidden></span><span class="frag" hidden></span><span class="frag" hidden></span>
+  </div>
+  <aside class="notes"><p>A stepper with N steps needs N−1 hidden .frag spans.</p></aside>
+</section>
+
+<!-- 9 · practice list -->
+<section class="slide" id="s-copy" data-k="D · Best practices" data-sec="D">
+  <h2 class="a" style="font-size:84px">What I'd tell you to copy.</h2>
+  <div class="prac">
+    <div class="pr a" style="--d:1"><i>1</i><div><b>A short imperative</b><span>One line on why it works.</span></div></div>
+    <div class="pr a" style="--d:1"><i>2</i><div><b>A short imperative</b><span>One line on why it works.</span></div></div>
+    <div class="pr a" style="--d:2"><i>3</i><div><b>A short imperative</b><span>One line on why it works.</span></div></div>
+    <div class="pr a" style="--d:2"><i>4</i><div><b>A short imperative</b><span>One line on why it works.</span></div></div>
+    <div class="pr a" style="--d:3"><i>5</i><div><b>A short imperative</b><span>One line on why it works.</span></div></div>
+    <div class="pr a" style="--d:3"><i>6</i><div><b>A short imperative</b><span>One line on why it works.</span></div></div>
+  </div>
+</section>
+
+<!-- 10 · finale -->
+<section class="slide" id="s-end" data-k="Thank you" data-sec="·" data-blue="1">
+  <div class="finale">
+    <div class="jrn"><span style="--i:0">Understand</span><i>→</i><span style="--i:1">Think</span><i>→</i><span style="--i:2">Apply</span></div>
+    <div class="qa-big a" style="--d:6"><b>Questions?</b><p>Thank you.<br><strong>Presenter name</strong> · Team</p></div>
+  </div>
+</section>
+
+</main>
+
+<div id="notes" hidden><h5>Presenter notes</h5><div id="notesBody"></div></div>
+<div id="ctrls">
+  <button class="ctl" id="prev" type="button" aria-label="Previous slide">←</button>
+  <button class="ctl" id="next" type="button" aria-label="Next slide">→</button>
+  <button class="ctl" id="motionBtn" type="button" aria-pressed="true" title="Toggle animations (A)">Animations: On</button>
+  <button class="ctl" id="notesBtn" type="button" aria-pressed="false">Notes</button>
+  <button class="ctl" id="fsBtn" type="button" aria-label="Full screen">Full screen</button>
+</div>
+
+<script>
+/* Deck engine. Keys: → / space next, ← back, Home/End, N notes, F full screen, A animations.
+   Each slide may contain .frag elements revealed one per → press. On every change the slide
+   gets data-step="n" and a 'stepchange' event, so slide CSS/JS can react to the step. */
+(function(){
+  const KEY='deck-motion';
+  const stage=document.getElementById('stage');
+  const slides=[...stage.querySelectorAll('.slide')];
+  const N=slides.length; let cur=-1, reduce=false;
+  try{reduce=localStorage.getItem(KEY)==='off';}catch(e){}
+  document.body.classList.toggle('no-motion',reduce);
+
+  function fit(){const s=Math.min((innerWidth-32)/1920,(innerHeight-20)/1080);stage.style.transform='translate(-50%,-50%) scale('+s+')';}
+  addEventListener('resize',fit);fit();
+
+  const frags=i=>[...slides[i].querySelectorAll('.frag')];
+  function sync(i){
+    const s=slides[i], n=frags(i).filter(f=>f.classList.contains('shown')).length;
+    s.dataset.step=n;
+    s.querySelectorAll('[data-at]').forEach(el=>el.classList.toggle('lit',n>=+el.dataset.at));
+    s.querySelectorAll('.stp').forEach(st=>{
+      st.querySelectorAll('.stp-node').forEach((x,k)=>{x.classList.toggle('on',k===n);x.classList.toggle('seen',k<n);});
+      st.querySelectorAll('.stp-panel').forEach((x,k)=>x.classList.toggle('on',k===n));
+    });
+    s.dispatchEvent(new CustomEvent('stepchange',{detail:n}));
+  }
+  function countUps(s){
+    s.querySelectorAll('[data-to]').forEach(el=>{
+      const to=+el.dataset.to,pre=el.dataset.pre||'',suf=el.dataset.suf||'';
+      if(reduce){el.textContent=pre+to+suf;return;}
+      const t0=performance.now()+350,dur=1300;
+      const tick=t=>{const p=Math.min(1,Math.max(0,(t-t0)/dur));el.textContent=pre+Math.round(to*(1-Math.pow(1-p,3)))+suf;if(p<1)requestAnimationFrame(tick);};
+      requestAnimationFrame(tick);
+    });
+  }
+  function show(i,fromEnd){
+    i=Math.max(0,Math.min(N-1,i));
+    slides.forEach((s,k)=>{s.classList.toggle('active',k===i);s.classList.toggle('past',k<i);});
+    frags(i).forEach(f=>f.classList.toggle('shown',!!fromEnd));
+    cur=i; sync(i);
+    document.body.classList.toggle('blue',!!slides[i].dataset.blue);
+    document.querySelector('#kicker b').textContent=slides[i].dataset.sec||'·';
+    document.querySelector('#kicker span').textContent=slides[i].dataset.k||'';
+    document.getElementById('pageno').textContent=String(i+1).padStart(2,'0')+' / '+N;
+    document.querySelector('#rail i').style.width=((i+1)/N*100)+'%';
+    const nt=slides[i].querySelector('.notes');document.getElementById('notesBody').innerHTML=nt?nt.innerHTML:'';
+    try{history.replaceState(null,'','#slide-'+(i+1));}catch(e){}
+    document.querySelectorAll('.slide video').forEach(v=>{try{if(slides[i].contains(v)){v.currentTime=0;const p=v.play();if(p)p.catch(()=>{});}else v.pause();}catch(e){}});
+    countUps(slides[i]);
+    slides[i].dispatchEvent(new CustomEvent('slideenter'));
+  }
+  function next(){const h=frags(cur).filter(f=>!f.classList.contains('shown'));if(h.length){h[0].classList.add('shown');sync(cur);return;}if(cur<N-1)show(cur+1);}
+  function prev(){const s=frags(cur).filter(f=>f.classList.contains('shown'));if(s.length){s[s.length-1].classList.remove('shown');sync(cur);return;}if(cur>0)show(cur-1,true);}
+  document.getElementById('next').onclick=next;document.getElementById('prev').onclick=prev;
+
+  const notes=document.getElementById('notes'),nb=document.getElementById('notesBtn');
+  function tn(){notes.hidden=!notes.hidden;nb.setAttribute('aria-pressed',String(!notes.hidden));}
+  nb.onclick=tn;
+  function fs(){try{if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});else if(document.documentElement.requestFullscreen)document.documentElement.requestFullscreen().catch(()=>{});}catch(e){}}
+  document.getElementById('fsBtn').onclick=fs;
+
+  const mb=document.getElementById('motionBtn');
+  function setMotion(on){
+    reduce=!on;document.body.classList.toggle('no-motion',reduce);
+    mb.setAttribute('aria-pressed',String(on));mb.textContent='Animations: '+(on?'On':'Off');
+    try{localStorage.setItem(KEY,on?'on':'off');}catch(e){}
+    if(cur>=0){const keep=frags(cur).filter(f=>f.classList.contains('shown')).length,sl=slides[cur];
+      sl.classList.remove('active');void sl.offsetWidth;show(cur);frags(cur).forEach((f,k)=>f.classList.toggle('shown',k<keep));sync(cur);}
+  }
+  mb.addEventListener('click',()=>setMotion(reduce));
+
+  addEventListener('keydown',e=>{
+    if(e.target.closest&&e.target.closest('button')&&(e.key===' '||e.key==='Enter'))return;
+    if(e.ctrlKey||e.metaKey||e.altKey)return;
+    const k=e.key;
+    if(k==='ArrowRight'||k==='PageDown'||k===' '){e.preventDefault();next();}
+    else if(k==='ArrowLeft'||k==='PageUp'){e.preventDefault();prev();}
+    else if(k==='Home')show(0);else if(k==='End')show(N-1,true);
+    else if(k==='n'||k==='N')tn();else if(k==='f'||k==='F')fs();
+    else if(k==='a'||k==='A')setMotion(reduce);
+  });
+  let tx=null;
+  addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
+  addEventListener('touchend',e=>{if(tx==null)return;const d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)(d<0?next:prev)();tx=null;});
+
+  // stepper: clicking a node jumps to that step
+  document.querySelectorAll('.stp').forEach(st=>{
+    const idx=slides.indexOf(st.closest('.slide'));
+    st.querySelectorAll('.stp-node').forEach((nd,k)=>nd.addEventListener('click',e=>{
+      e.stopPropagation();frags(idx).forEach((f,j)=>f.classList.toggle('shown',j<k));sync(idx);
+    }));
+  });
+  document.addEventListener('click',e=>{const b=e.target.closest('#stage button');if(b&&e.detail>0)setTimeout(()=>b.blur(),0);},true);
+  addEventListener('hashchange',()=>{const m=/^#slide-(\d+)$/.exec(location.hash||'');if(m&&+m[1]-1!==cur)show(+m[1]-1);});
+
+  // test hooks used by scripts/audit.py
+  window.__show=show;
+  window.__goStep=(idx,n)=>{if(idx!==cur)show(idx);frags(idx).forEach((f,j)=>f.classList.toggle('shown',j<n));sync(idx);};
+  window.__deck={count:N,current:()=>cur};
+
+  setMotion(!reduce);
+  const m=/^#slide-(\d+)$/.exec(location.hash||'');show(m?+m[1]-1:0);
+})();
+</script>
+</body>
+</html>

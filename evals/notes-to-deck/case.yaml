@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: notes-to-deck
+expected_outcome: |
+  A single self-contained HTML presentation built from the notes: light background,
+  one idea per slide, the 11-days vs 5-days numbers and the six-step process shown
+  visually (not as plain bullet lists), step reveals, presenter notes, keyboard navigation,
+  and no layout errors.
+context:
+  scaffold_script: place-files.sh

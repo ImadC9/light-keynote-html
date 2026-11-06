@@ -1,0 +1,7 @@
+schema_version: "1.1"
+name: short-talk-from-brief
+expected_outcome: |
+  A single self-contained HTML presentation of roughly 7 slides on cycle counting vs annual
+  stock take: light keynote look, animated entrances and at least one step reveal, the ABC idea
+  and the 98% target shown visually, a clear closing ask (30 minutes per shift), presenter notes,
+  and no layout errors.
